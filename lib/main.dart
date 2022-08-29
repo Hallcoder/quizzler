@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 //TODO: Step 2 - Import the rFlutter_Alert package here.
-import 'question.dart';
 import 'quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -34,113 +34,125 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  List<Icon> scoreKeeper =  [];
+  List<Icon> scoreKeeper = [];
   int questionNumber = 0;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-         Expanded(
-          flex: 5,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Center(
-              child: Text(
-                quizBrain.getQuestionText(questionNumber),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 25.0,
-                  color: Colors.white,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Center(
+                child: Text(
+                  quizBrain.getQuestionText(questionNumber),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 25.0,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: FlatButton(
-              textColor: Colors.white,
-              color: Colors.green,
-              child: const Text(
-                'True',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: FlatButton(
+                  textColor: Colors.white,
+                  color: Colors.green,
+                  child: const Text(
+                    'True',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  onPressed: () {
+                    //The user picked true.
+                    bool correctAnswer =
+                        quizBrain.getQuestionAnswer(questionNumber);
+                    if (correctAnswer == true) {
+                      print('User got it right');
+                      scoreKeeper.add(const Icon(
+                        Icons.check,
+                        color: Colors.green,
+                      ));
+                    } else {
+                      print('User got it wrong');
+                      scoreKeeper
+                          .add(const Icon(Icons.close, color: Colors.red));
+                    }
+                    ;
+                    setState(() {
+                      int r = quizBrain.nextQuestion();
+                      if (r == 1) {
+                        Alert(
+                                context: context,
+                                title: 'Quizzler',
+                                desc: 'Congratulations!')
+                            .show();
+                      }
+                    });
+                  }),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: FlatButton(
+                color: Colors.red,
+                child: const Text(
+                  'False',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              onPressed: () {
-                //The user picked true.
-                bool correctAnswer = quizBrain.getQuestionAnswer(questionNumber);
-                if(correctAnswer == true){
-                  print('User got it right');
-                  scoreKeeper.add(const Icon(
-                    Icons.check,
-                    color: Colors.green,
-                  ));
-                }else{
-                  print('User got it wrong');
-                  scoreKeeper.add(const Icon(
-                      Icons.close,
-                      color:Colors.red
-                  ));
-                };
+                onPressed: () {
+                  //The user picked false.;
+                  bool correctAnswer =
+                      quizBrain.getQuestionAnswer(questionNumber);
+                  if (correctAnswer == false) {
+                    scoreKeeper.add(const Icon(
+                      Icons.check,
+                      color: Colors.green,
+                    ));
+                    print('User got it right');
+                  } else {
+                    print('User got it wrong');
+                    scoreKeeper.add(const Icon(Icons.close, color: Colors.red));
+                  }
                   setState(() {
-                    quizBrain.nextQuestion();
+                    int r = quizBrain.nextQuestion();
+                    if (r == 1) {
+                      Alert(
+                              context: context,
+                              type: AlertType.success,
+                              title: 'Quizzler',
+                              desc: 'Congratulations!',
+                              closeFunction: (){
+                                quizBrain.reset();
+                                scoreKeeper.clear();
+                              }
+                      )
+                          .show();
+                    }
                   });
-                }
-            ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: FlatButton(
-              color: Colors.red,
-              child: const Text(
-                'False',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.white,
-                ),
+                },
               ),
-              onPressed: () {
-                //The user picked false.;
-                bool correctAnswer = quizBrain.getQuestionAnswer(questionNumber);
-                if(correctAnswer == false){
-                  scoreKeeper.add(const Icon(
-                    Icons.check,
-                    color: Colors.green,
-                  ));
-                  print('User got it right');
-                }else{
-                  print('User got it wrong');
-                  scoreKeeper.add(const Icon(
-                      Icons.close,
-                      color:Colors.red
-                  ));
-                }
-
-                  setState(() {
-                    quizBrain.nextQuestion();
-                  });
-
-              },
             ),
           ),
-        ),
-        Row(
-          children: scoreKeeper,
-        )
-        ]
-    );
+          Row(
+            children: scoreKeeper,
+          )
+        ]);
   }
 }
-
-
 
 /*
  'You can lead a cow down stairs but not up stairs.', false,
